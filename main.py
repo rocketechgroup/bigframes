@@ -13,7 +13,7 @@ bpd.options.bigquery.location = "eu"
     [int],
     str,
     bigquery_connection="bigframes-rf-conn",
-    reuse=False,
+    reuse=True,
     packages=[],
 )
 def get_mapped_duration(x):
@@ -35,7 +35,7 @@ def get_mapped_duration(x):
     [str],
     str,
     bigquery_connection="bigframes-rf-conn",
-    reuse=False,
+    reuse=True,
     packages=["cryptography"],
 )
 def get_encrypted(x):
@@ -102,19 +102,20 @@ top_5_addresses = df.groupby(["start_station_name"]).agg(
 print(top_5_by_day_of_week)
 print(top_5_addresses)
 
-# Clean up cloud artifacts
-session = bpd.get_global_session()
-for function in (get_mapped_duration, get_encrypted):
-    try:
-        session.bqclient.delete_routine(function.bigframes_remote_function)
-    except Exception:
-        # Ignore exception during clean-up
-        pass
 
-    try:
-        session.cloudfunctionsclient.delete_function(
-            name=function.bigframes_cloud_function
-        )
-    except Exception:
-        # Ignore exception during clean-up
-        pass
+# Clean up cloud artifacts
+# session = bpd.get_global_session()
+# for function in (get_mapped_duration, get_encrypted):
+#     try:
+#         session.bqclient.delete_routine(function.bigframes_remote_function)
+#     except Exception:
+#         # Ignore exception during clean-up
+#         pass
+#
+#     try:
+#         session.cloudfunctionsclient.delete_function(
+#             name=function.bigframes_cloud_function
+#         )
+#     except Exception:
+#         # Ignore exception during clean-up
+#         pass
