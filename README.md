@@ -9,7 +9,8 @@ A solution using BigQuery - BigFrames to fetch London cycle data, process it usi
 
 ## Limitations & mitigations
 * Bigframes cannot change configuration of remote functions, this is [hard coded](https://github.com/googleapis/python-bigquery-dataframes/blob/main/bigframes/remote_function.py#L404), however, it can use existing Remote functions instead
-* Bigframes's dynamically created Remote functions has ingress rules open to the internet
+* Bigframes' dynamically created Remote functions cannot be easily re-used. Any code changes will result in a new function being deployed 
+* Bigframes' dynamically created Remote functions has ingress rules open to the internet
 
 
 ## Thanks to
