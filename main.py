@@ -1,13 +1,14 @@
 import os
 import bigframes.pandas as bpd
 
-bpd.options.bigquery.project = os.environ.get('GCP_PROJECT_ID')
+bpd.options.bigquery.project = os.environ.get("GCP_PROJECT_ID")
 bpd.options.bigquery.location = "eu"
 
 
 # Warning, all remote functions created via bigframes has a public ingress rule,
 # currently there appears to be no way to change it at creation time
 # see https://github.com/googleapis/python-bigquery-dataframes/blob/main/bigframes/remote_function.py#L404
+
 
 @bpd.remote_function(
     [int],
@@ -18,17 +19,17 @@ bpd.options.bigquery.location = "eu"
 )
 def get_mapped_duration(x):
     if x < 120:
-        return 'under 2 hours'
+        return "under 2 hours"
     elif x < 240:
-        return '2-4 hours'
+        return "2-4 hours"
     elif x < 360:
-        return '4-6 hours'
+        return "4-6 hours"
     elif x < 480:
-        return '6-8 hours'
+        return "6-8 hours"
     elif 480 <= x < 1440:
-        return '8-24 hours'
+        return "8-24 hours"
     else:
-        return '> 24 hours'
+        return "> 24 hours"
 
 
 @bpd.remote_function(
@@ -83,21 +84,34 @@ WHERE start_date > '2023-01-01'
 
 df["day_of_week"] = df["day_of_week"].map(
     {
-        2: "Monday", 3: "Tuesday", 4: "Wednesday", 5: "Thursday", 6: "Friday",
-        7: "Saturday", 1: "Sunday"
+        2: "Monday",
+        3: "Tuesday",
+        4: "Wednesday",
+        5: "Thursday",
+        6: "Friday",
+        7: "Saturday",
+        1: "Sunday",
     }
 )
 
 df["duration"] = df["duration"].map(get_mapped_duration)
 df["start_station_name"] = df["start_station_name"].map(get_encrypted)
 
-top_5_by_day_of_week = df.groupby(["day_of_week", "duration"]).agg(
-    {"transactions": "sum"}
-).reset_index().sort_values(by="transactions", ascending=False).head(5)
+top_5_by_day_of_week = (
+    df.groupby(["day_of_week", "duration"])
+    .agg({"transactions": "sum"})
+    .reset_index()
+    .sort_values(by="transactions", ascending=False)
+    .head(5)
+)
 
-top_5_addresses = df.groupby(["start_station_name"]).agg(
-    {"transactions": "sum"}
-).reset_index().sort_values(by="transactions", ascending=False).head(5)
+top_5_addresses = (
+    df.groupby(["start_station_name"])
+    .agg({"transactions": "sum"})
+    .reset_index()
+    .sort_values(by="transactions", ascending=False)
+    .head(5)
+)
 
 print(top_5_by_day_of_week)
 print(top_5_addresses)
